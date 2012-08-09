@@ -29,13 +29,9 @@ public class Main {
     public static void main(String[] args) throws Exception {
         String proprietary = "com\\.(billshrink|buxwatch)";
         LicenseScanner scanner = new LicenseScanner();
-        // String binary =
-        // "/billshrink/code/buxwatch/trunk/buxapp/target/buxwatch.war";
-        // System.out.println("Scanning " + binary);
-        // scanner.scan(new File(binary), proprietary);
-        String folder = "/billshrink/code/buxwatch/trunk/buxapp/target/buxwatch";
-        System.out.println("Scanning " + folder);
-        scanner.scan(new File(folder), proprietary);
+        String target = args[0];
+        System.out.println("Scanning " + target);
+        scanner.scan(new File(target), proprietary);
     }
 
 }
