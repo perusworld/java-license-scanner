@@ -1,0 +1,62 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>com.yosanai.licensescanner</groupId>
+	<artifactId>java-license-scanner</artifactId>
+	<version>1.0</version>
+	<name>License Scanner</name>
+	<description>License Scanner</description>
+	<licenses>
+		<license>
+			<name>MIT License</name>
+			<url>http://www.opensource.org/licenses/mit-license.php</url>
+			<distribution>repo</distribution>
+		</license>
+	</licenses>
+	<developers>
+		<developer>
+			<id>perusworld</id>
+			<name>Saravana Perumal Shanmugam</name>
+			<url>http://www.perusworld.com</url>
+		</developer>
+	</developers>
+	<distributionManagement>
+		<repository>
+			<id>repository</id>
+			<url>file://repo</url>
+		</repository>
+	</distributionManagement>
+	<scm>
+		<developerConnection>Saravana Perumal Shanmugam</developerConnection>
+		<url>https://perusworld@github.com/perusworld/java-license-scanner.git</url>
+	</scm>
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<configuration>
+					<source>1.6</source>
+					<target>1.6</target>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+	<dependencies>
+		<dependency>
+			<groupId>de.schlichtherle.truezip</groupId>
+			<artifactId>truezip-path</artifactId>
+			<version>7.6</version>
+		</dependency>
+		<dependency>
+			<groupId>de.schlichtherle.truezip</groupId>
+			<artifactId>truezip-driver-tar</artifactId>
+			<version>7.6</version>
+		</dependency>
+		<dependency>
+			<groupId>de.schlichtherle.truezip</groupId>
+			<artifactId>truezip-driver-zip</artifactId>
+			<version>7.6</version>
+		</dependency>
+	</dependencies>
+</project>
