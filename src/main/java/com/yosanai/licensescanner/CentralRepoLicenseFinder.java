@@ -20,6 +20,10 @@ package com.yosanai.licensescanner;
 
 import java.io.ByteArrayOutputStream;
 import java.net.URL;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 import org.apache.commons.io.IOUtils;
 
@@ -29,6 +33,22 @@ import org.apache.commons.io.IOUtils;
  */
 public class CentralRepoLicenseFinder implements LicenseFinder {
 
+    protected Map<String, Set<License>> known = new HashMap<String, Set<License>>();
+
+    /**
+     * 
+     */
+    public CentralRepoLicenseFinder() {
+    }
+
+    /**
+     * @param known
+     */
+    public CentralRepoLicenseFinder(Map<String, Set<License>> known) {
+        super();
+        this.known = known;
+    }
+
     /*
      * (non-Jsdoc)
      * 
@@ -37,11 +57,32 @@ public class CentralRepoLicenseFinder implements LicenseFinder {
      */
     @Override
     public void getLicenses(Artifact artifact) throws Exception {
-        String searchQuery = "http://search.maven.org/remotecontent?filepath=" + artifact.getGroup().replaceAll("\\.", "/") + "/" + artifact.getArtifact() + "/" + artifact.getVersion() + "/"
-                + artifact.getArtifact() + "-" + artifact.getVersion() + ".pom";
-        ByteArrayOutputStream bos = new ByteArrayOutputStream();
-        IOUtils.copy(new URL(searchQuery).openStream(), bos);
-        String pom = new String(bos.toByteArray());
-        System.out.println(artifact.getGroup() + artifact.getArtifact() + artifact.getVersion() + pom.contains("license"));
+        if (null != artifact && artifact.getLicenses().isEmpty()) {
+            Set<License> licenses = null;
+            String key = artifact.getGroup() + "." + artifact.getArtifact() + "." + artifact.getVersion();
+            if (null != known && known.containsKey(key)) {
+                licenses = known.get(key);
+            } else {
+                if (null != known) {
+                    for (String knownKey : known.keySet()) {
+                        if (key.matches(knownKey)) {
+                            licenses = known.get(knownKey);
+                            break;
+                        }
+                    }
+                }
+                if (null == licenses) {
+                    licenses = new HashSet<License>();
+                }
+            }
+            if (licenses.isEmpty()) {
+                String searchQuery = "http://search.maven.org/remotecontent?filepath=" + artifact.getGroup().replaceAll("\\.", "/") + "/" + artifact.getArtifact() + "/" + artifact.getVersion() + "/"
+                        + artifact.getArtifact() + "-" + artifact.getVersion() + ".pom";
+                ByteArrayOutputStream bos = new ByteArrayOutputStream();
+                IOUtils.copy(new URL(searchQuery).openStream(), bos);
+                String pom = new String(bos.toByteArray());
+            }
+            artifact.getLicenses().addAll(licenses);
+        }
     }
 }

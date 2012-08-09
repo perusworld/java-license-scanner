@@ -38,6 +38,8 @@ public class ClassDef {
 
     protected Map<Class<?>, URL> filteredHierarchy = new LinkedHashMap<Class<?>, URL>();
 
+    protected Map<Class<?>, Artifact> filteredArtifact = new LinkedHashMap<Class<?>, Artifact>();
+
     /**
      * @param classObj
      * @param container
@@ -106,6 +108,21 @@ public class ClassDef {
      */
     public void setFilteredHierarchy(Map<Class<?>, URL> filteredHierarchy) {
         this.filteredHierarchy = filteredHierarchy;
+    }
+
+    /**
+     * @return the filteredArtifact
+     */
+    public Map<Class<?>, Artifact> getFilteredArtifact() {
+        return filteredArtifact;
+    }
+
+    /**
+     * @param filteredArtifact
+     *            the filteredArtifact to set
+     */
+    public void setFilteredArtifact(Map<Class<?>, Artifact> filteredArtifact) {
+        this.filteredArtifact = filteredArtifact;
     }
 
 }

@@ -26,6 +26,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import de.schlichtherle.truezip.file.TFile;
 
@@ -178,7 +179,7 @@ public class LicenseScanner {
         return ret;
     }
 
-    public void scan(File file, String proprietary) throws Exception {
+    public void scan(File file, String proprietary, Set<License> filterLicenses) throws Exception {
         String proprietaryPath = ".*?" + proprietary.replace("\\.", "[\\\\\\/]+") + ".*?$";
         Distribution distribution = load(file, proprietaryPath);
         ScannerClassLoader scannerClassLoader = null;
@@ -190,6 +191,45 @@ public class LicenseScanner {
                 externals.addAll(classDef.getFilteredHierarchy().values());
             }
             Map<URL, Artifact> externalLicense = findArtifacts(externals);
+            Artifact artifact = null;
+            for (URL jar : externalLicense.keySet()) {
+                artifact = externalLicense.get(jar);
+                if (null != artifact) {
+                    for (ClassDef classDef : classDefs) {
+                        for (Class<?> classObj : classDef.getFilteredHierarchy().keySet()) {
+                            classDef.getFilteredArtifact().put(classObj, externalLicense.get(classDef.getFilteredHierarchy().get(classObj)));
+                        }
+                    }
+                }
+            }
+            boolean hasFiltered = false;
+            for (ClassDef classDef : classDefs) {
+                hasFiltered = false;
+                for (Class<?> classObj : classDef.getFilteredArtifact().keySet()) {
+                    artifact = classDef.getFilteredArtifact().get(classObj);
+                    if (null == artifact) {
+                        hasFiltered = true;
+                        break;
+                    } else {
+                        for (License license : filterLicenses) {
+                            if (artifact.getLicenses().contains(license)) {
+                                hasFiltered = true;
+                                break;
+                            }
+                        }
+                    }
+                    if (hasFiltered) {
+                        break;
+                    }
+                }
+                if (hasFiltered) {
+                    System.out.println("Processing " + classDef.getClassObj().getName());
+                    for (Class<?> classObj : classDef.getFilteredArtifact().keySet()) {
+                        artifact = classDef.getFilteredArtifact().get(classObj);
+                        System.out.println(classObj.getName() + " - " + (null == artifact ? "Unknown licenses" : artifact));
+                    }
+                }
+            }
         } finally {
             if (null != scannerClassLoader) {
                 scannerClassLoader.close();

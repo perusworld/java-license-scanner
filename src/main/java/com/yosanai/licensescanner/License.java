@@ -1,5 +1,5 @@
 /**
- * com.yosanai.licensescanner.Main
+ * com.yosanai.licensescanner.License
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
  * this software and associated documentation files (the "Software"), 
@@ -18,23 +18,10 @@
  */
 package com.yosanai.licensescanner;
 
-import java.io.File;
-import java.util.HashSet;
-import java.util.Set;
-
 /**
  * @author Saravana Perumal Shanmugam
  * 
  */
-public class Main {
-
-    public static void main(String[] args) throws Exception {
-        String proprietary = "com\\.(billshrink|buxwatch)";
-        LicenseScanner scanner = new LicenseScanner();
-        Set<License> filterLicenses = new HashSet<License>();
-        String target = args[0];
-        System.out.println("Scanning " + target);
-        scanner.scan(new File(target), proprietary, filterLicenses);
-    }
-
+public enum License {
+    APACHE2, MIT, GPL, LGPL, BSD
 }

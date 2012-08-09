@@ -58,7 +58,7 @@ public class CentralRepoArtifactFinder implements ArtifactFinder {
         Artifact ret = null;
         String fileName = file.getPath().substring(file.getPath().lastIndexOf('/') + 1).replaceAll("\\.jar$", "");
         ret = known.get(fileName);
-        if (null != ret) {
+        if (null == ret) {
             String artifact = fileName.replaceAll("\\-[\\d\\.][-\\d\\w\\.]+$", "");
             String version = fileName.replace(artifact, "").substring(1);
             String searchQuery = "http://search.maven.org/solrsearch/select?q=a:\"" + artifact + "\"%20AND%20v:\"" + version + "\"&wt=json";
@@ -72,6 +72,7 @@ public class CentralRepoArtifactFinder implements ArtifactFinder {
                     ret = new Artifact(jsonObject.getString("g"), jsonObject.getString("a"), jsonObject.getString("v"));
                 }
             } else {
+                System.out.println("could not find " + file.toString());
                 // multiple matches so ignore for now
             }
         }

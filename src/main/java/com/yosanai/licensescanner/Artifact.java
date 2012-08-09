@@ -18,6 +18,9 @@
  */
 package com.yosanai.licensescanner;
 
+import java.util.HashSet;
+import java.util.Set;
+
 /**
  * @author Saravana Perumal Shanmugam
  * 
@@ -29,6 +32,8 @@ public class Artifact {
     protected String artifact;
 
     protected String version;
+
+    protected Set<License> licenses = new HashSet<License>();
 
     /**
      * @param group
@@ -61,6 +66,21 @@ public class Artifact {
      */
     public String getVersion() {
         return version;
+    }
+
+    /**
+     * @return the licenses
+     */
+    public Set<License> getLicenses() {
+        return licenses;
+    }
+
+    /**
+     * @param licenses
+     *            the licenses to set
+     */
+    public void setLicenses(Set<License> licenses) {
+        this.licenses = licenses;
     }
 
 }
