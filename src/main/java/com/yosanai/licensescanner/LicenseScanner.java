@@ -19,7 +19,6 @@
 package com.yosanai.licensescanner;
 
 import java.io.File;
-import java.io.FilenameFilter;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -66,36 +65,44 @@ public class LicenseScanner {
      */
     public static final String FULL_CLASS = ".*\\.class$";
 
+    protected ArtifactFinder artifactFinder = new CentralRepoArtifactFinder();
+
+    protected LicenseFinder licenseFinder = new CentralRepoLicenseFinder();
+
     /**
-     * @author Saravana Perumal Shanmugam
      * 
      */
+    public LicenseScanner() {
+    }
 
-    private final class SimpleFileNameFilter implements FilenameFilter {
+    /**
+     * @return the artifactFinder
+     */
+    public ArtifactFinder getArtifactFinder() {
+        return artifactFinder;
+    }
 
-        protected String nameInclusion;
+    /**
+     * @param artifactFinder
+     *            the artifactFinder to set
+     */
+    public void setArtifactFinder(ArtifactFinder artifactFinder) {
+        this.artifactFinder = artifactFinder;
+    }
 
-        protected String pathInclusion;
+    /**
+     * @return the licenseFinder
+     */
+    public LicenseFinder getLicenseFinder() {
+        return licenseFinder;
+    }
 
-        public SimpleFileNameFilter(String nameInclusion) {
-            super();
-            this.nameInclusion = nameInclusion;
-        }
-
-        /**
-         * @param nameInclusion
-         * @param pathInclusion
-         */
-        public SimpleFileNameFilter(String nameInclusion, String pathInclusion) {
-            super();
-            this.nameInclusion = nameInclusion;
-            this.pathInclusion = pathInclusion;
-        }
-
-        @Override
-        public boolean accept(File dir, String name) {
-            return name.matches(this.nameInclusion) && (null == pathInclusion || dir.getAbsolutePath().matches(pathInclusion));
-        }
+    /**
+     * @param licenseFinder
+     *            the licenseFinder to set
+     */
+    public void setLicenseFinder(LicenseFinder licenseFinder) {
+        this.licenseFinder = licenseFinder;
     }
 
     public URL getJar(ScannerClassLoader classLoader, Class<?> classObj) throws Exception {
@@ -158,8 +165,16 @@ public class LicenseScanner {
         return ret;
     }
 
-    public Map<URL, String> findLicense(Collection<URL> jars) {
-        Map<URL, String> ret = new HashMap<URL, String>();
+    public Map<URL, Artifact> findArtifacts(Collection<URL> jars) throws Exception {
+        Map<URL, Artifact> ret = new HashMap<URL, Artifact>();
+        Artifact artifact = null;
+        for (URL jar : jars) {
+            artifact = artifactFinder.findArtifact(jar);
+            if (null != artifact) {
+                licenseFinder.getLicenses(artifact);
+            }
+            ret.put(jar, artifact);
+        }
         return ret;
     }
 
@@ -170,12 +185,11 @@ public class LicenseScanner {
         try {
             scannerClassLoader = load(distribution);
             List<ClassDef> classDefs = analyze(distribution, scannerClassLoader, proprietary + ".*?$");
-            HashSet<String> externals = new HashSet<String>();
+            HashSet<URL> externals = new HashSet<URL>();
             for (ClassDef classDef : classDefs) {
-                for (Class<?> external : classDef.getFilteredHierarchy().keySet()) {
-                    externals.add(classDef.getFilteredHierarchy().get(external).toString());
-                }
+                externals.addAll(classDef.getFilteredHierarchy().values());
             }
+            Map<URL, Artifact> externalLicense = findArtifacts(externals);
         } finally {
             if (null != scannerClassLoader) {
                 scannerClassLoader.close();
