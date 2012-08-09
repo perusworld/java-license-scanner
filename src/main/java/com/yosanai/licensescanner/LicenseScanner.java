@@ -226,7 +226,7 @@ public class LicenseScanner {
                     System.out.println("Processing " + classDef.getClassObj().getName());
                     for (Class<?> classObj : classDef.getFilteredArtifact().keySet()) {
                         artifact = classDef.getFilteredArtifact().get(classObj);
-                        System.out.println(classObj.getName() + " - " + (null == artifact ? "Unknown licenses" : artifact));
+                        System.out.println(classObj.getName() + " - " + (null == artifact ? "Unknown licenses" : artifact.getLicenses()));
                     }
                 }
             }
